@@ -26,6 +26,7 @@
       rocmPackages.hipblas
       rocmPackages.hipblaslt
       rocmPackages.hipblas-common
+      rocmPackages.rocminfo
       pciutils
     ]
     else if variant == "CPU"
@@ -75,6 +76,9 @@ in
           torchvision
           torchaudio
           torchsde
+          ultralytics
+          llama-cpp-python
+          bitsandbytes
         ]
       else [];
 

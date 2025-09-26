@@ -28,3 +28,21 @@ spandrel
 soundfile
 pydantic~=2.0
 pydantic-settings~=2.0
+
+#custom nodes
+GitPython
+PyGithub
+matrix-nio
+typer
+rich
+toml
+chardet
+segment-anything
+scikit-image
+piexif
+opencv-python-headless
+dill
+git+https://github.com/facebookresearch/sam2
+ultralytics
+accelerate
+bitsandbytes
