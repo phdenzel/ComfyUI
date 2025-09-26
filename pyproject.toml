@@ -3,7 +3,7 @@ name = "ComfyUI"
 version = "0.3.60"
 readme = "README.md"
 license = { file = "LICENSE" }
-requires-python = ">=3.9"
+requires-python = ">=3.10"
 dependencies = [
     "aiohttp>=3.11.8",
     "alembic>=1.16.5",
@@ -12,11 +12,15 @@ dependencies = [
     "comfyui-embedded-docs==0.2.6",
     "comfyui-frontend-package==1.26.13",
     "comfyui-workflow-templates==0.1.86",
+    "dill>=0.4.0",
     "einops>=0.8.1",
     "gitpython>=3.1.45",
     "kornia>=0.7.1",
+    "matplotlib>=3.9.4",
     "matrix-nio>=0.25.2",
     "numpy>=1.25.0",
+    "opencv-python-headless>=4.11.0.86",
+    "piexif>=1.1.3",
     "pillow>=11.3.0",
     "psutil>=7.1.0",
     "pydantic~=2.0",
@@ -25,7 +29,10 @@ dependencies = [
     "pyyaml>=6.0.2",
     "rich>=14.1.0",
     "safetensors>=0.4.2",
+    "sam-2",
+    "scikit-image>=0.24.0",
     "scipy>=1.13.1",
+    "segment-anything>=1.0",
     "sentencepiece>=0.2.1",
     "soundfile>=0.13.1",
     "spandrel>=0.4.1",
@@ -39,6 +46,7 @@ dependencies = [
     "tqdm>=4.67.1",
     "transformers>=4.37.2",
     "typer>=0.19.2",
+    "ultralytics>=8.3.203",
     "yarl>=1.18.0",
 ]
 
@@ -59,3 +67,6 @@ lint.select = [
   "F",
 ]
 exclude = ["*.ipynb", "**/generated/*.pyi"]
+
+[tool.uv.sources]
+sam-2 = { git = "https://github.com/facebookresearch/sam2" }
