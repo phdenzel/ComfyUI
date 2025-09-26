@@ -30,6 +30,7 @@ cd $PKG_DIR
 [ ! -d "$PKG_DIR/custom_nodes/comfyui-impact-pack" ] && git clone https://github.com/ltdrdata/ComfyUI-Impact-Pack.git $PKG_DIR/custom_nodes/comfyui-impact-pack
 [ ! -d "$PKG_DIR/custom_nodes/comfyui-impact-subpack" ] && git clone https://github.com/ltdrdata/ComfyUI-Impact-Subpack.git $PKG_DIR/custom_nodes/comfyui-impact-subpack
 [ ! -d "$PKG_DIR/custom_nodes/comfyui-comfyui-yolo" ] && git clone https://github.com/kadirnar/ComfyUI-YOLO.git $PKG_DIR/custom_nodes/comfyui-yolo
+[ ! -d "$PKG_DIR/custom_nodes/comfyui-comfyui-transformers" ] && git clone https://github.com/kadirnar/ComfyUI-Transformers.git $PKG_DIR/custom_nodes/comfyui-transformers
 uv sync
 
 # Run webui
