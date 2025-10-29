@@ -77,10 +77,14 @@ cd $PKG_DIR
 [ ! -d "$PKG_DIR/custom_nodes/comfyui-impact-pack" ] && git clone https://github.com/ltdrdata/ComfyUI-Impact-Pack.git $PKG_DIR/custom_nodes/comfyui-impact-pack
 [ ! -d "$PKG_DIR/custom_nodes/comfyui-impact-subpack" ] && git clone https://github.com/ltdrdata/ComfyUI-Impact-Subpack.git $PKG_DIR/custom_nodes/comfyui-impact-subpack
 [ ! -d "$PKG_DIR/custom_nodes/ComfyUI-Easy-Use" ] && git clone https://github.com/yolain/ComfyUI-Easy-Use.git $PKG_DIR/custom_nodes/ComfyUI-Easy-Use
+[ ! -d "$PKG_DIR/custom_nodes/ComfyUI-ReActor" ] && git clone https://github.com/Gourieff/ComfyUI-ReActor.git $PKG_DIR/custom_nodes/ComfyUI-ReActor
 [ ! -d "$PKG_DIR/custom_nodes/comfyui-comfyui-yolo" ] && git clone https://github.com/kadirnar/ComfyUI-YOLO.git $PKG_DIR/custom_nodes/comfyui-yolo
 [ ! -d "$PKG_DIR/custom_nodes/comfyui-comfyui-transformers" ] && git clone https://github.com/kadirnar/ComfyUI-Transformers.git $PKG_DIR/custom_nodes/comfyui-transformers
 [ ! -d "$PKG_DIR/custom_nodes/ComfyUI-VideoHelperSuite" ] && git clone https://github.com/Kosinkadink/ComfyUI-VideoHelperSuite.git $PKG_DIR/custom_nodes/ComfyUI-VideoHelperSuite
+[ ! -d "$PKG_DIR/custom_nodes/was-node-suite-comfyui" ] && git clone https://github.com/ltdrdata/was-node-suite-comfyui.git $PKG_DIR/custom_nodes/was-node-suite-comfyui
 [ ! -d "$PKG_DIR/custom_nodes/ComfyUI_Sonic" ] && git clone https://github.com/smthemex/ComfyUI_Sonic.git $PKG_DIR/custom_nodes/ComfyUI_Sonic
+[ ! -d "$PKG_DIR/custom_nodes/VibeVoice-ComfyUI" ] && git clone https://github.com/Enemyx-net/VibeVoice-ComfyUI.git $PKG_DIR/custom_nodes/VibeVoice-ComfyUI
+[ ! -d "$PKG_DIR/custom_nodes/comfyui-kokoro" ] && git clone https://github.com/stavsap/comfyui-kokoro.git $PKG_DIR/custom_nodes/comfyui-kokoro
 uv sync
 
 # Run webui
