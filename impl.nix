@@ -41,6 +41,7 @@ in
       hardware_deps
       ++ [
         git
+        ffmpeg
         (python313.withPackages (
           p:
             with p; [
@@ -79,6 +80,10 @@ in
           ultralytics
           llama-cpp-python
           bitsandbytes
+          accelerate
+          onnxruntime
+          numba
+          diffusers
         ]
       else [];
 

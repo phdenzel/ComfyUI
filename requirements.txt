@@ -1,5 +1,5 @@
-comfyui-frontend-package==1.26.13
-comfyui-workflow-templates==0.1.91
+comfyui-frontend-package==1.28.8
+comfyui-workflow-templates==0.2.3
 comfyui-embedded-docs==0.2.6
 torch
 torchsde
@@ -46,3 +46,15 @@ git+https://github.com/facebookresearch/sam2
 ultralytics
 accelerate
 bitsandbytes
+huggingface-hub>0.20
+insightface
+diffusers >=0.29.0
+onnx
+onnxruntime
+numba
+omegaconf
+imageio
+imageio-ffmpeg
+librosa
+typing-extensions
+timm>=0.4.12
