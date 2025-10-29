@@ -3,23 +3,70 @@
 #SBATCH --job-name=comfyUI
 #SBATCH --ntasks=1
 #SBATCH --nodes=1
-#SBATCH --gres=gpu:1
+#SBATCH --gres=gpu:h100pcie:1
 #SBATCH --cpus-per-task=8
 #SBATCH --mem=128G
-#SBATCH --account=cai_ivs
-#SBATCH --partition=gpu_top
-#SBATCH --mail-user=denp@zhaw.ch
-#SBATCH --output=/cluster/home/denp/logs/%x.id%j.%N.sbatch.out
-#SBATCH --error=/cluster/home/denp/logs/%x.id%j.%N.sbatch.err
+#SBATCH --account=cai_teaching
+#SBATCH --nodelist=sanjose
+#SBATCH --partition=teaching
+#SBATCH --output=/cluster/projects/2025_image_tools/logs/%x.id%j.%N.sbatch.out
+#SBATCH --error=/cluster/projects/2025_image_tools/logs/%x.id%j.%N.sbatch.err
 # #SBATCH --signal=B:SIGUSR1@900
+
+usage() {
+    cat <<EOF
+Usage: $0 [-p|--port <in>] [-h|--help]
+
+        This is a SLURM batch script for deploying comfyUI.
+
+    Options:
+        -p, --port             Port for the server.
+        -h, --help             Print this message.
+EOF
+}
+
 
 # Defaults
 CU_MODULE=cuda/12.8.0
 PY_MODULE=python/3.13.2
 UV_MODULE=uv/0.6.12
 ENV_NAME="comfy-ui"  # define python virtualenv name
-PKG_DIR="/cluster/home/denp/comfyUI"
-PORT=8623
+PKG_DIR="/cluster/projects/2025_image_tools/comfyUI"
+PORT="${PORT:-9102}"
+
+# Parse args
+OPTS=$(getopt -o p:h --long help,port: -- "$@")
+if [ $? != 0 ] ; then
+    echo "[`date '+%Y-%m-%d %T.%3N'`][SLURM] - Failed to parse arguments." >&2
+    exit 1
+fi
+eval set -- "$OPTS"
+
+while true; do
+    case "$1" in
+        -p|--port)
+            PORT="$2"
+            shift 2
+            ;;
+        -h|--help)
+            usage
+            exit 0
+            ;;
+        --)
+            shift
+            break
+            ;;
+        *)
+            shift
+            ;;
+    esac
+done
+# Required arguments
+if [[ $PORT -ge 8500 && $PORT -le 9100 ]]; then
+    echo "Port $PORT is within the allowed range."
+else
+    echo "Port $PORT is outside the allowed range."
+fi
 
 # load modules
 module load "$CU_MODULE"
