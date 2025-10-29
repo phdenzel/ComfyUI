@@ -85,6 +85,12 @@ cd $PKG_DIR
 [ ! -d "$PKG_DIR/custom_nodes/ComfyUI_Sonic" ] && git clone https://github.com/smthemex/ComfyUI_Sonic.git $PKG_DIR/custom_nodes/ComfyUI_Sonic
 [ ! -d "$PKG_DIR/custom_nodes/VibeVoice-ComfyUI" ] && git clone https://github.com/Enemyx-net/VibeVoice-ComfyUI.git $PKG_DIR/custom_nodes/VibeVoice-ComfyUI
 [ ! -d "$PKG_DIR/custom_nodes/comfyui-kokoro" ] && git clone https://github.com/stavsap/comfyui-kokoro.git $PKG_DIR/custom_nodes/comfyui-kokoro
+[ ! -d "$PKG_DIR/custom_nodes/rgthree-comfy" ] && git clone https://github.com/rgthree/rgthree-comfy $PKG_DIR/custom_nodes/rgthree-comfy
+[ ! -d "$PKG_DIR/custom_nodes/ComfyUI_UltimateSDUpscale" ] && git clone https://github.com/ssitu/ComfyUI_UltimateSDUpscale.git --recursive $PKG_DIR/custom_nodes/ComfyUI_UltimateSDUpscale
+[ ! -d "$PKG_DIR/custom_nodes/masquerade-nodes-comfyui" ] && git clone https://github.com/BadCafeCode/masquerade-nodes-comfyui.git $PKG_DIR/custom_nodes/masquerade-nodes-comfyui
+[ ! -d "$PKG_DIR/custom_nodes/ComfyUI-Flowty-LDSR" ] && git clone https://github.com/flowtyone/ComfyUI-Flowty-LDSR.git $PKG_DIR/custom_nodes/ComfyUI-Flowty-LDSR
+# [ ! -d "$PKG_DIR/custom_nodes/" ] && git clone  $PKG_DIR/custom_nodes/
+# [ ! -d "$PKG_DIR/custom_nodes/" ] && git clone  $PKG_DIR/custom_nodes/
 uv sync
 
 # Run webui
