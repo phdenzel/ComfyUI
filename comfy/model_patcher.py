@@ -123,16 +123,30 @@ def move_weight_functions(m, device):
     return memory
 
 class LowVramPatch:
-    def __init__(self, key, patches):
+    def __init__(self, key, patches, convert_func=None, set_func=None):
         self.key = key
         self.patches = patches
+        self.convert_func = convert_func
+        self.set_func = set_func
+
     def __call__(self, weight):
         intermediate_dtype = weight.dtype
+        if self.convert_func is not None:
+            weight = self.convert_func(weight.to(dtype=torch.float32, copy=True), inplace=True)
+
         if intermediate_dtype not in [torch.float32, torch.float16, torch.bfloat16]: #intermediate_dtype has to be one that is supported in math ops
             intermediate_dtype = torch.float32
-            return comfy.float.stochastic_rounding(comfy.lora.calculate_weight(self.patches[self.key], weight.to(intermediate_dtype), self.key, intermediate_dtype=intermediate_dtype), weight.dtype, seed=string_to_seed(self.key))
+            out = comfy.lora.calculate_weight(self.patches[self.key], weight.to(intermediate_dtype), self.key, intermediate_dtype=intermediate_dtype)
+            if self.set_func is None:
+                return comfy.float.stochastic_rounding(out, weight.dtype, seed=string_to_seed(self.key))
+            else:
+                return self.set_func(out, seed=string_to_seed(self.key), return_weight=True)
 
-        return comfy.lora.calculate_weight(self.patches[self.key], weight, self.key, intermediate_dtype=intermediate_dtype)
+        out = comfy.lora.calculate_weight(self.patches[self.key], weight, self.key, intermediate_dtype=intermediate_dtype)
+        if self.set_func is not None:
+            return self.set_func(out, seed=string_to_seed(self.key), return_weight=True).to(dtype=intermediate_dtype)
+        else:
+            return out
 
 def get_key_weight(model, key):
     set_func = None
@@ -224,6 +238,7 @@ class ModelPatcher:
         self.force_cast_weights = False
         self.patches_uuid = uuid.uuid4()
         self.parent = None
+        self.pinned = set()
 
         self.attachments: dict[str] = {}
         self.additional_models: dict[str, list[ModelPatcher]] = {}
@@ -604,6 +619,21 @@ class ModelPatcher:
         else:
             set_func(out_weight, inplace_update=inplace_update, seed=string_to_seed(key))
 
+    def pin_weight_to_device(self, key):
+        weight, set_func, convert_func = get_key_weight(self.model, key)
+        if comfy.model_management.pin_memory(weight):
+            self.pinned.add(key)
+
+    def unpin_weight(self, key):
+        if key in self.pinned:
+            weight, set_func, convert_func = get_key_weight(self.model, key)
+            comfy.model_management.unpin_memory(weight)
+            self.pinned.remove(key)
+
+    def unpin_all_weights(self):
+        for key in list(self.pinned):
+            self.unpin_weight(key)
+
     def _load_list(self):
         loading = []
         for n, m in self.model.named_modules():
@@ -657,16 +687,20 @@ class ModelPatcher:
                         if force_patch_weights:
                             self.patch_weight_to_device(weight_key)
                         else:
-                            m.weight_function = [LowVramPatch(weight_key, self.patches)]
+                            _, set_func, convert_func = get_key_weight(self.model, weight_key)
+                            m.weight_function = [LowVramPatch(weight_key, self.patches, convert_func, set_func)]
                             patch_counter += 1
                     if bias_key in self.patches:
                         if force_patch_weights:
                             self.patch_weight_to_device(bias_key)
                         else:
-                            m.bias_function = [LowVramPatch(bias_key, self.patches)]
+                            _, set_func, convert_func = get_key_weight(self.model, bias_key)
+                            m.bias_function = [LowVramPatch(bias_key, self.patches, convert_func, set_func)]
                             patch_counter += 1
 
                     cast_weight = True
+                    for param in params:
+                        self.pin_weight_to_device("{}.{}".format(n, param))
                 else:
                     if hasattr(m, "comfy_cast_weights"):
                         wipe_lowvram_weight(m)
@@ -697,7 +731,9 @@ class ModelPatcher:
                         continue
 
                 for param in params:
-                    self.patch_weight_to_device("{}.{}".format(n, param), device_to=device_to)
+                    key = "{}.{}".format(n, param)
+                    self.unpin_weight(key)
+                    self.patch_weight_to_device(key, device_to=device_to)
 
                 logging.debug("lowvram: loaded module regularly {} {}".format(n, m))
                 m.comfy_patched_weights = True
@@ -746,6 +782,7 @@ class ModelPatcher:
         self.eject_model()
         if unpatch_weights:
             self.unpatch_hooks()
+            self.unpin_all_weights()
             if self.model.model_lowvram:
                 for m in self.model.modules():
                     move_weight_functions(m, device_to)
@@ -825,10 +862,12 @@ class ModelPatcher:
                         module_mem += move_weight_functions(m, device_to)
                         if lowvram_possible:
                             if weight_key in self.patches:
-                                m.weight_function.append(LowVramPatch(weight_key, self.patches))
+                                _, set_func, convert_func = get_key_weight(self.model, weight_key)
+                                m.weight_function.append(LowVramPatch(weight_key, self.patches, convert_func, set_func))
                                 patch_counter += 1
                             if bias_key in self.patches:
-                                m.bias_function.append(LowVramPatch(bias_key, self.patches))
+                                _, set_func, convert_func = get_key_weight(self.model, bias_key)
+                                m.bias_function.append(LowVramPatch(bias_key, self.patches, convert_func, set_func))
                                 patch_counter += 1
                             cast_weight = True
 
@@ -838,6 +877,9 @@ class ModelPatcher:
                         m.comfy_patched_weights = False
                         memory_freed += module_mem
                         logging.debug("freed {}".format(n))
+
+                        for param in params:
+                            self.pin_weight_to_device("{}.{}".format(n, param))
 
             self.model.model_lowvram = True
             self.model.lowvram_patch_counter += patch_counter
